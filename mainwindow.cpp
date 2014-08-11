@@ -112,6 +112,8 @@ void MainWindow::on_actionOpen_triggered()
 
 void MainWindow::on_tableCsv_customContextMenuRequested(const QPoint &pos)
 {
+    Q_UNUSED(pos);
+
     QMenu menu;
     auto cbAction = new QAction(tr("Copy to clipboard"), this);
     cbAction->setData("clipboard");
