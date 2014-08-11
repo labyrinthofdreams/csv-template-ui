@@ -16,6 +16,9 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
+     <widget class="QPlainTextEdit" name="templateEdit"/>
+    </item>
+    <item>
      <widget class="QTableWidget" name="tableCsv">
       <property name="selectionBehavior">
        <enum>QAbstractItemView::SelectRows</enum>
