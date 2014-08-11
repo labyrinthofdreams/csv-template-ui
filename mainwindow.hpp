@@ -23,6 +23,8 @@ private slots:
 
     void on_tableCsv_customContextMenuRequested(const QPoint &pos);
 
+    void on_actionMappings_triggered();
+
 private:
     Ui::MainWindow *ui;
 

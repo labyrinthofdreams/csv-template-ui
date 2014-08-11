@@ -13,6 +13,7 @@
 #include <QString>
 #include <QStringList>
 #include <QTableWidgetItem>
+#include <QTableWidgetSelectionRange>
 #include <QTextStream>
 #include "columnmappingdialog.hpp"
 #include "mainwindow.hpp"
@@ -111,29 +112,41 @@ void MainWindow::on_actionOpen_triggered()
 
 void MainWindow::on_tableCsv_customContextMenuRequested(const QPoint &pos)
 {
-    QModelIndex item = ui->tableCsv->indexAt(pos);
-    qDebug() << item.row();
-    const QStringList list = config.value("mapped_keys").toStringList();
-    QMap<QString, QString> mappings;
-    for(int i = 0, end = ui->tableCsv->columnCount(); i != end; ++i) {
-        mappings.insert(list.at(i), ui->tableCsv->item(item.row(), i)->text());
-    }
-
     QMenu menu;
     auto cbAction = new QAction(tr("Copy to clipboard"), this);
     cbAction->setData("clipboard");
     menu.addAction(cbAction);
     auto selected = menu.exec(QCursor::pos());
     if(selected && selected->data().toString() == "clipboard") {
-        QString tpl = ui->templateEdit->toPlainText();
-        QMapIterator<QString, QString> iter(mappings);
-        while(iter.hasNext()) {
-            iter.next();
-            const QString var = tr("$%1").arg(iter.key());
-            tpl.replace(var, iter.value());
+        const auto ranges = ui->tableCsv->selectedRanges();
+        QString parsedTpl;
+        for(const auto& range : ranges) {
+            const QStringList list = config.value("mapped_keys").toStringList();
+            QMap<QString, QString> mappings;
+            for(int rIdx = range.topRow(), rEnd = range.bottomRow(); rIdx <= rEnd; ++rIdx) {
+                for(int i = 0, end = ui->tableCsv->columnCount(); i != end; ++i) {
+                    mappings.insert(list.at(i), ui->tableCsv->item(rIdx, i)->text());
+                }
+
+                QString tpl = ui->templateEdit->toPlainText();
+                QMapIterator<QString, QString> iter(mappings);
+                while(iter.hasNext()) {
+                    iter.next();
+                    const QString var = tr("$%1").arg(iter.key());
+                    tpl.replace(var, iter.value());
+                }
+
+                parsedTpl.append(tpl);
+                parsedTpl.append("\n");
+            }
         }
 
         auto clipboard = QApplication::clipboard();
-        clipboard->setText(tpl);
+        clipboard->setText(parsedTpl);
     }
+}
+
+void MainWindow::on_actionMappings_triggered()
+{
+
 }
