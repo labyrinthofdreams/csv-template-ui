@@ -13,8 +13,14 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    columnmappingdialog.cpp
 
-HEADERS  += mainwindow.hpp
+HEADERS  += mainwindow.hpp \
+    columnmappingdialog.hpp \
+    csvparser.hpp
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    columnmappingdialog.ui
+
+QMAKE_CXXFLAGS += -std=c++11
