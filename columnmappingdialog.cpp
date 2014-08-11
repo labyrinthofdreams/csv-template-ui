@@ -54,6 +54,9 @@ ColumnMappingDialog::ColumnMappingDialog(QWidget *parent) :
     firstRow = inFile.readLine();
     firstRow.remove('\n');
 
+    const bool hasHeader = config.value("has_header", false).toBool();
+    ui->checkBoxHeader->setChecked(hasHeader);
+
     source = parseCsv(firstRow);
 
     ui->tableWidget->setRowCount(source.size());
