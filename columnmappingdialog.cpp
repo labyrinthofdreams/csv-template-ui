@@ -10,23 +10,10 @@
 #include <QStringList>
 #include <QTableWidgetItem>
 #include "columnmappingdialog.hpp"
-#include "sfcsv/sfcsv.h"
 #include "ui_columnmappingdialog.h"
 
 static const auto validChars = [](QChar c){ return (c >= 'a' && c <= 'z') ||
                                                    (c >= 'A' && c <= 'Z') || c == '_'; };
-
-extern QStringList parseCsv(const QString& in) {
-    QStringList result;
-    std::vector<std::string> parsed;
-    const std::string line = in.toStdString();
-    sfcsv::parse_line(line, std::back_inserter(parsed), ',');
-    for(auto&& res : parsed) {
-        result.append(QString::fromStdString(res));
-    }
-
-    return result;
-}
 
 static QString getValidField(const QString& text) {
     QString validText;
@@ -44,20 +31,10 @@ ColumnMappingDialog::ColumnMappingDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    // Read first row from CSV file
-    QString firstRow;
-    QFile inFile(config.value("last_opened").toString());
-    if(!inFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        throw std::runtime_error("Unable to open file");
-    }
-
-    firstRow = inFile.readLine();
-    firstRow.remove('\n');
-
     const bool hasHeader = config.value("has_header", false).toBool();
     ui->checkBoxHeader->setChecked(hasHeader);
 
-    source = parseCsv(firstRow);
+    source = config.value("source_keys").toStringList();
 
     ui->tableWidget->setRowCount(source.size());
     for(int i = 0, size = source.size(); i < size; ++i) {

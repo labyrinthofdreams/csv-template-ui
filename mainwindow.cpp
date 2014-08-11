@@ -17,9 +17,20 @@
 #include <QTextStream>
 #include "columnmappingdialog.hpp"
 #include "mainwindow.hpp"
+#include "sfcsv/sfcsv.h"
 #include "ui_mainwindow.h"
 
-extern QStringList parseCsv(const QString& in);
+static QStringList parseCsv(const QString& in) {
+    QStringList result;
+    std::vector<std::string> parsed;
+    const std::string line = in.toStdString();
+    sfcsv::parse_line(line, std::back_inserter(parsed), ',');
+    for(auto&& res : parsed) {
+        result.append(QString::fromStdString(res));
+    }
+
+    return result;
+}
 
 QStringList parseFile(const QString& in) {
     QStringList results;
@@ -62,6 +73,19 @@ void MainWindow::on_actionOpen_triggered()
     }
 
     config.setValue("last_opened", openedFile);
+
+    // Read first row from CSV file
+    QString firstRow;
+    QFile inFile(config.value("last_opened").toString());
+    if(!inFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        throw std::runtime_error("Unable to open file");
+    }
+
+    firstRow = inFile.readLine();
+    firstRow.remove('\n');
+
+    const QStringList source = parseCsv(firstRow);
+    config.setValue("source_keys", source);
 
     try {
         ColumnMappingDialog dlg;
