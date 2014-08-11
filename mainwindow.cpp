@@ -1,8 +1,15 @@
 #include <exception>
+#include <QAction>
+#include <QClipboard>
+#include <QCursor>
 #include <QDebug>
 #include <QFile>
 #include <QFileDialog>
+#include <QMap>
+#include <QMapIterator>
+#include <QMenu>
 #include <QMessageBox>
+#include <QModelIndex>
 #include <QString>
 #include <QStringList>
 #include <QTableWidgetItem>
@@ -73,6 +80,7 @@ void MainWindow::on_actionOpen_triggered()
         // Set header
         ui->tableCsv->clear();
         ui->tableCsv->setRowCount(lines.size());
+        ui->tableCsv->setColumnCount(lines.size());
         const bool hasHeader = config.value("has_header", false).toBool();
         if(hasHeader) {
             const QStringList labels = parseCsv(lines.at(0));
@@ -98,5 +106,34 @@ void MainWindow::on_actionOpen_triggered()
     }
     catch(std::exception &ex) {
         QMessageBox::critical(this, tr("Error"), QString(ex.what()));
+    }
+}
+
+void MainWindow::on_tableCsv_customContextMenuRequested(const QPoint &pos)
+{
+    QModelIndex item = ui->tableCsv->indexAt(pos);
+    qDebug() << item.row();
+    const QStringList list = config.value("mapped_keys").toStringList();
+    QMap<QString, QString> mappings;
+    for(int i = 0, end = ui->tableCsv->columnCount(); i != end; ++i) {
+        mappings.insert(list.at(i), ui->tableCsv->item(item.row(), i)->text());
+    }
+
+    QMenu menu;
+    auto cbAction = new QAction(tr("Copy to clipboard"), this);
+    cbAction->setData("clipboard");
+    menu.addAction(cbAction);
+    auto selected = menu.exec(QCursor::pos());
+    if(selected && selected->data().toString() == "clipboard") {
+        QString tpl = ui->templateEdit->toPlainText();
+        QMapIterator<QString, QString> iter(mappings);
+        while(iter.hasNext()) {
+            iter.next();
+            const QString var = tr("$%1").arg(iter.key());
+            tpl.replace(var, iter.value());
+        }
+
+        auto clipboard = QApplication::clipboard();
+        clipboard->setText(tpl);
     }
 }
