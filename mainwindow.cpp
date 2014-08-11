@@ -139,7 +139,6 @@ void MainWindow::on_tableCsv_customContextMenuRequested(const QPoint &pos)
                 }
 
                 parsedTpl.append(tpl);
-                parsedTpl.append("\n");
             }
         }
 
