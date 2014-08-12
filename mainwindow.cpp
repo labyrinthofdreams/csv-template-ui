@@ -40,6 +40,7 @@ QStringList parseFile(const QString& in) {
     }
 
     QTextStream stream(&inFile);
+    stream.setCodec("UTF-8");
     while(!stream.atEnd()) {
         const QString line = stream.readLine().remove("\n");
         results << line;
