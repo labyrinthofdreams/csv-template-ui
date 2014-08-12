@@ -191,6 +191,17 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::on_templateEdit_textChanged()
 {
+    const auto ranges = ui->tableCsv->selectedRanges();
+    if(ranges.empty()) {
+        ui->templatePreview->setPlainText(ui->templateEdit->toPlainText());
+    }
+    else {
+        renderPreview();
+    }
+}
+
+void MainWindow::renderPreview()
+{
     QString parsedTpl;
     const auto ranges = ui->tableCsv->selectedRanges();
     for(const auto& range : ranges) {
@@ -214,4 +225,9 @@ void MainWindow::on_templateEdit_textChanged()
     }
 
     ui->templatePreview->setPlainText(parsedTpl);
+}
+
+void MainWindow::on_tableCsv_itemSelectionChanged()
+{
+    renderPreview();
 }

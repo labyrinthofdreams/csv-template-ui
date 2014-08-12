@@ -29,10 +29,14 @@ private slots:
 
     void on_templateEdit_textChanged();
 
+    void on_tableCsv_itemSelectionChanged();
+
 private:
     Ui::MainWindow *ui;
 
     QSettings config;
+
+    void renderPreview();
 };
 
 #endif // MAINWINDOW_HPP
