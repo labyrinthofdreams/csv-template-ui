@@ -197,3 +197,23 @@ void MainWindow::on_buttonOpen_clicked()
     QTextStream stream(&in);
     ui->templateEdit->setPlainText(stream.readAll());
 }
+
+void MainWindow::on_buttonSaveAs_clicked()
+{
+    const QString savePath = QFileDialog::getSaveFileName(this, tr("Save as..."));
+    if(savePath.isEmpty()) {
+        return;
+    }
+
+    QFile out(savePath);
+    if(!out.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(this, tr("File error"),
+                              tr("Unable to open selected file"));
+        return;
+    }
+
+    QTextStream stream(&out);
+    stream << ui->templateEdit->toPlainText();
+
+    ui->statusBar->showMessage(tr("Saved as %1").arg(savePath));
+}
