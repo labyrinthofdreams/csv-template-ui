@@ -21,13 +21,13 @@ public:
 private slots:
     void on_actionOpen_triggered();
 
-    void on_tableCsv_customContextMenuRequested(const QPoint &pos);
-
     void on_actionMappings_triggered();
 
     void on_actionOpen_template_triggered();
 
     void on_actionSave_triggered();
+
+    void on_templateEdit_textChanged();
 
 private:
     Ui::MainWindow *ui;

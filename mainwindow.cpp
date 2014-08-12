@@ -140,43 +140,6 @@ void MainWindow::on_actionOpen_triggered()
     }
 }
 
-void MainWindow::on_tableCsv_customContextMenuRequested(const QPoint &pos)
-{
-    Q_UNUSED(pos);
-
-    QMenu menu;
-    auto cbAction = new QAction(tr("Copy to clipboard"), this);
-    cbAction->setData("clipboard");
-    menu.addAction(cbAction);
-    auto selected = menu.exec(QCursor::pos());
-    if(selected && selected->data().toString() == "clipboard") {
-        const auto ranges = ui->tableCsv->selectedRanges();
-        QString parsedTpl;
-        for(const auto& range : ranges) {
-            const QStringList list = config.value("mapped_keys").toStringList();
-            QMap<QString, QString> mappings;
-            for(int rIdx = range.topRow(), rEnd = range.bottomRow(); rIdx <= rEnd; ++rIdx) {
-                for(int i = 0, end = ui->tableCsv->columnCount(); i != end; ++i) {
-                    mappings.insert(list.at(i), ui->tableCsv->item(rIdx, i)->text());
-                }
-
-                QString tpl = ui->templateEdit->toPlainText();
-                QMapIterator<QString, QString> iter(mappings);
-                while(iter.hasNext()) {
-                    iter.next();
-                    const QString var = tr("$%1").arg(iter.key());
-                    tpl.replace(var, iter.value());
-                }
-
-                parsedTpl.append(tpl);
-            }
-        }
-
-        auto clipboard = QApplication::clipboard();
-        clipboard->setText(parsedTpl);
-    }
-}
-
 void MainWindow::on_actionMappings_triggered()
 {
     ColumnMappingDialog dlg;
@@ -224,4 +187,31 @@ void MainWindow::on_actionSave_triggered()
     stream << ui->templateEdit->toPlainText();
 
     ui->statusBar->showMessage(tr("Saved as %1").arg(savePath));
+}
+
+void MainWindow::on_templateEdit_textChanged()
+{
+    QString parsedTpl;
+    const auto ranges = ui->tableCsv->selectedRanges();
+    for(const auto& range : ranges) {
+        const QStringList list = config.value("mapped_keys").toStringList();
+        QMap<QString, QString> mappings;
+        for(int rIdx = range.topRow(), rEnd = range.bottomRow(); rIdx <= rEnd; ++rIdx) {
+            for(int i = 0, end = ui->tableCsv->columnCount(); i != end; ++i) {
+                mappings.insert(list.at(i), ui->tableCsv->item(rIdx, i)->text());
+            }
+
+            QString tpl = ui->templateEdit->toPlainText();
+            QMapIterator<QString, QString> iter(mappings);
+            while(iter.hasNext()) {
+                iter.next();
+                const QString var = tr("$%1").arg(iter.key());
+                tpl.replace(var, iter.value());
+            }
+
+            parsedTpl.append(tpl);
+        }
+    }
+
+    ui->templatePreview->setPlainText(parsedTpl);
 }
