@@ -175,5 +175,6 @@ void MainWindow::on_tableCsv_customContextMenuRequested(const QPoint &pos)
 
 void MainWindow::on_actionMappings_triggered()
 {
-
+    ColumnMappingDialog dlg;
+    dlg.exec();
 }
