@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <QChar>
-#include <QDebug>
 #include <QFile>
 #include <QString>
 #include <QStringList>
@@ -35,19 +34,24 @@ ColumnMappingDialog::ColumnMappingDialog(QWidget *parent) :
     ui->checkBoxHeader->setChecked(hasHeader);
 
     source = config.value("source_keys").toStringList();
+    mapped = config.value("mapped_keys").toStringList();
 
     ui->tableWidget->setRowCount(source.size());
     for(int i = 0, size = source.size(); i < size; ++i) {
         const QString rawText = source.at(i);
-        const QString validText = getValidField(rawText);
+        QString validText = getValidField(rawText);
+        if(source.size() == mapped.size()) {
+            validText = mapped.at(i);
+        }
+        else {
+            mapped << validText;
+        }
 
         auto itemSrc = new QTableWidgetItem(rawText);
         auto itemMap = new QTableWidgetItem(validText);
 
         ui->tableWidget->setItem(i, 0, itemSrc);
         ui->tableWidget->setItem(i, 1, itemMap);
-
-        mapped << validText;
     }
 
     config.setValue("mapped_keys", mapped);
@@ -67,15 +71,19 @@ void ColumnMappingDialog::on_tableWidget_cellChanged(int row, int column)
     else if(column == 1) {
         // Only certain characters are allowed
         const QString text = ui->tableWidget->item(row, column)->text();
-        const bool valid = std::all_of(text.cbegin(), text.cend(), std::cref(validChars));
-        if(!valid) {
-            // Remove all bad characters
-            const QString validText = getValidField(text);
-            ui->tableWidget->item(row, column)->setText(validText);
 
-            mapped.replace(row, validText);
-            config.setValue("mapped_keys", mapped);
+        // Remove all bad characters
+        const QString validText = getValidField(text);
+        const bool valid = std::all_of(text.cbegin(), text.cend(), std::cref(validChars));
+        if(!valid) {            
+            ui->tableWidget->item(row, column)->setText(validText);
         }
+
+        if(row < mapped.size()) {
+            mapped.replace(row, validText);
+        }
+
+        config.setValue("mapped_keys", mapped);
     }
 }
 
