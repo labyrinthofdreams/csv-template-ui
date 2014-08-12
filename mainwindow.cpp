@@ -179,7 +179,7 @@ void MainWindow::on_actionMappings_triggered()
     dlg.exec();
 }
 
-void MainWindow::on_buttonOpen_clicked()
+void MainWindow::on_actionOpen_template_triggered()
 {
     const QString openedFile =
             QFileDialog::getOpenFileName(this, tr("Open template"));
@@ -198,7 +198,7 @@ void MainWindow::on_buttonOpen_clicked()
     ui->templateEdit->setPlainText(stream.readAll());
 }
 
-void MainWindow::on_buttonSaveAs_clicked()
+void MainWindow::on_actionSave_triggered()
 {
     const QString savePath = QFileDialog::getSaveFileName(this, tr("Save as..."));
     if(savePath.isEmpty()) {

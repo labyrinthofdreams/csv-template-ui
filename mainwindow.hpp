@@ -25,9 +25,9 @@ private slots:
 
     void on_actionMappings_triggered();
 
-    void on_buttonOpen_clicked();
+    void on_actionOpen_template_triggered();
 
-    void on_buttonSaveAs_clicked();
+    void on_actionSave_triggered();
 
 private:
     Ui::MainWindow *ui;
