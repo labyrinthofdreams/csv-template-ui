@@ -178,3 +178,22 @@ void MainWindow::on_actionMappings_triggered()
     ColumnMappingDialog dlg;
     dlg.exec();
 }
+
+void MainWindow::on_buttonOpen_clicked()
+{
+    const QString openedFile =
+            QFileDialog::getOpenFileName(this, tr("Open template"));
+    if(openedFile.isEmpty()) {
+        return;
+    }
+
+    QFile in(openedFile);
+    if(!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::critical(this, tr("File error"),
+                              tr("Unable to open selected file"));
+        return;
+    }
+
+    QTextStream stream(&in);
+    ui->templateEdit->setPlainText(stream.readAll());
+}
