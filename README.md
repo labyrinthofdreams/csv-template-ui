@@ -12,4 +12,4 @@ Process CSV files through a template in desired format
 
 Variables in the template are the mapped names prefixed with $.
 
-<img src="http://i.imgur.com/IbrTsCK.png"> 
+<img src="http://i.imgur.com/X8GEJXe.png"> 
