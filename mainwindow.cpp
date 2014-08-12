@@ -1,4 +1,7 @@
 #include <exception>
+#include <iterator>
+#include <string>
+#include <vector>
 #include <QAction>
 #include <QClipboard>
 #include <QCursor>
@@ -32,7 +35,7 @@ static QStringList parseCsv(const QString& in) {
     return result;
 }
 
-QStringList parseFile(const QString& in) {
+QStringList parseFile(const QString& in, const QString& codec) {
     QStringList results;
     QFile inFile(in);
     if(!inFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -40,7 +43,7 @@ QStringList parseFile(const QString& in) {
     }
 
     QTextStream stream(&inFile);
-    stream.setCodec("UTF-8");
+    stream.setCodec(codec.toLatin1().constData());
     while(!stream.atEnd()) {
         const QString line = stream.readLine().remove("\n");
         results << line;
@@ -98,7 +101,7 @@ void MainWindow::on_actionOpen_triggered()
         }
 
         // Get all rows
-        QStringList lines = parseFile(openedFile);
+        QStringList lines = parseFile(openedFile, config.value("encoding", "UTF-8").toString());
         if(lines.isEmpty()) {
             QMessageBox::critical(this, tr("Empty CSV"),
                                   tr("CSV file does not contain any data"));
@@ -195,7 +198,9 @@ void MainWindow::on_actionOpen_template_triggered()
         return;
     }
 
+    const QString codec = config.value("encoding", "UTF-8").toString();
     QTextStream stream(&in);
+    stream.setCodec(codec.toLatin1().constData());
     ui->templateEdit->setPlainText(stream.readAll());
 }
 
@@ -213,7 +218,9 @@ void MainWindow::on_actionSave_triggered()
         return;
     }
 
+    const QString codec = config.value("encoding", "UTF-8").toString();
     QTextStream stream(&out);
+    stream.setCodec(codec.toLatin1().constData());
     stream << ui->templateEdit->toPlainText();
 
     ui->statusBar->showMessage(tr("Saved as %1").arg(savePath));

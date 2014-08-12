@@ -22,6 +22,8 @@ private slots:
 
     void on_checkBoxHeader_clicked(bool checked);
 
+    void on_buttonBox_accepted();
+
 private:
     Ui::ColumnMappingDialog *ui;
 

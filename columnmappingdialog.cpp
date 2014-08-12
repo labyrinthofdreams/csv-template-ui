@@ -1,13 +1,13 @@
 #include <algorithm>
 #include <functional>
-#include <stdexcept>
-#include <string>
-#include <vector>
+#include <QByteArray>
 #include <QChar>
 #include <QFile>
+#include <QList>
 #include <QString>
 #include <QStringList>
 #include <QTableWidgetItem>
+#include <QTextCodec>
 #include "columnmappingdialog.hpp"
 #include "ui_columnmappingdialog.h"
 
@@ -55,6 +55,7 @@ ColumnMappingDialog::ColumnMappingDialog(QWidget *parent) :
     }
 
     config.setValue("mapped_keys", mapped);
+    config.setValue("encoding", ui->comboBoxEncoding->currentText());
 }
 
 ColumnMappingDialog::~ColumnMappingDialog()
@@ -90,4 +91,9 @@ void ColumnMappingDialog::on_tableWidget_cellChanged(int row, int column)
 void ColumnMappingDialog::on_checkBoxHeader_clicked(bool checked)
 {
     config.setValue("has_header", checked);
+}
+
+void ColumnMappingDialog::on_buttonBox_accepted()
+{
+    config.setValue("encoding", ui->comboBoxEncoding->currentText());
 }
