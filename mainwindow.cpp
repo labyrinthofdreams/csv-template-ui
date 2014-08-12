@@ -61,6 +61,8 @@ MainWindow::~MainWindow()
     delete ui;
 
     config.remove("has_header");
+    config.remove("source_keys");
+    config.remove("mapped_keys");
 }
 
 void MainWindow::on_actionOpen_triggered()
